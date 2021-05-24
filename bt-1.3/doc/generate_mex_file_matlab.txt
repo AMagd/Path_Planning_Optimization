@@ -1,0 +1,47 @@
+This file contains some hints how mex file generation for Matlab could work.
+We cannot guarantee that the proposed methods work on your system. 
+
+Mex file generation for Octave is described in the bensolve tools reference manual.
+
+** LINUX and MACOS **
+
+Install GLPK.
+At the matlab command line, run:
+
+mex CFLAGS="\$CFLAGS -std=c99 -O3"  -lglpk -largeArrayDims -output bensolve src/bslv_algs.c src/bslv_lists.c src/bslv_lp.c src/bslv_main.c src/bslv_poly.c src/bslv_vlp.c
+	
+If glpk.h is not found, you can specify its location (here /usr/local/include):
+	
+mex CFLAGS="\$CFLAGS -std=c99 -O3" -I/usr/local/include -lglpk -largeArrayDims -output bensolve src/bslv_algs.c src/bslv_lists.c src/bslv_lp.c src/bslv_main.c src/bslv_poly.c src/bslv_vlp.c
+
+** WINDOWS **
+
+INSTALLING MINGW AND SETTING IT AS MEX COMPILER
+
+Install a version of the MinGW compiler for Windows:
+1. Download TDC-GCC 5.1.0 (MinGW compiler) e.g. from http://tdm-gcc.tdragon.net/download
+2. Install TDC-GCC in the default location (C:\TDM-GCC-64 or C:\TDM-GCC-32)
+//Set this compiler as mex compiler in Matlab
+3. Download the latest Gnumex version e.g. from https://sourceforge.net/projects/gnumex/files/
+4. Unpack the downloaded zip-archive in a place of your choice, run Matlab and move to the gnumex directory
+5. Run gnumex.m
+6. A window pops up, set (C:\TDM-GCC-64 or C:\TDM-GCC-32) as MinGW root directory and press "make options file"
+7. If an orange warning message occurs, follow the instructions
+8. Type "mex -setup" into your matlab command prompt, you should be able to choose a compiler called gcc in "C:\TDM-GC~1\bin" by typing the associated number 
+
+COMPILING 
+
+Download GLPK and generate a static library (the toolbox uses the glpk library):
+1. Download GLPK 4.60 from ftp://ftp.gnu.org/gnu/glpk/
+2. Unzip and store the GLPK folder anywhere you wish
+3. Create the files "Build_GLPK_with_MinGW.bat" ,  "config_MinGW" and "makefile_MinGW" in the w64/w32 subdirectory of your GLPK directory according to https://gist.github.com/andrewandrepowell/ddd5e99a52a0b8a26ebc305d42898226
+4. Run "Build_GLPK_with_MinGW.bat" (double click it)
+5. You obtain a libglpk.a file, copy it into the "src" directory of the bensolve tools
+//Compile the program
+6. Copy the 'glpk.h' file from the glpk folder in "src"
+7. Change your Matlab working directory to the bensolve tools directory
+8. Run the following command in the Matlab prompt: mex src/bslv_algs.c src/bslv_lists.c src/bslv_lp.c src/bslv_main.c src/bslv_poly.c src/bslv_vlp.c -largeArrayDims -output bensolve  CFLAGS="\$CFLAGS -std=c99"  -I'src' src\libglpk.a 
+
+Remark: If you want to use another glpk version, make sure to make the appropriate changes in makefile_MinGW 
+
+If you know an easier way, please let us know :)
